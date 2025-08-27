@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider } from "react-router";
 import { LoanRiskDashboard } from "..";
 import AppLayout from "@/layout";
 import { CustomerDetails } from "@/customer-details";
+import { SignInPage } from "@/pages/sign-in";
 
 const route = [
   {
@@ -14,6 +15,10 @@ const route = [
         element: <CustomerDetails />,
       },
     ],
+  },
+  {
+    path: "/sign-in",
+    element: <SignInPage />,
   },
 ];
 
