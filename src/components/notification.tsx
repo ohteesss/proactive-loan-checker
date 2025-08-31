@@ -27,12 +27,12 @@ export default function NotificationPopup({
         <div className="p-4 space-y-3">
           <div className="text-sm">
             <p className="font-medium text-destructive">
-              Chuckwudi Victoria - High Risk
+              Ngozi Nwosu - High Risk
             </p>
             <p className="text-muted-foreground mt-1">
               Payment overdue by 30 days
             </p>
-            <p className="text-muted-foreground">Loan Amount: ₦6,300,000</p>
+            <p className="text-muted-foreground">Loan Amount: ₦630,000</p>
           </div>
           <div className="flex gap-2">
             <Button
