@@ -1,17 +1,13 @@
-import {
-  AlertTriangle,
-  Shield,
-  TrendingDown,
-  TrendingUp,
-  Users
-} from "lucide-react";
+import { AlertTriangle, TrendingDown, TrendingUp, Users } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card";
-import { Progress } from "./components/ui/progress";
 import { customers } from "./constant/customer";
 
 function DashboardStats() {
-   const highRiskCustomers = customers.filter(
+  const highRiskCustomers = customers.filter(
     (customer) => customer.riskLevel === "High"
+  ).length;
+  const mediumRiskCustomers = customers.filter(
+    (customer) => customer.riskLevel === "Medium"
   ).length;
   const overdueCustomers = customers.filter(
     (customer) => customer.status === "Overdue"
@@ -21,12 +17,12 @@ function DashboardStats() {
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium flex items-center gap-2">
-           <AlertTriangle className="h-4 w-4 text-destructive" />
+            <AlertTriangle className="h-4 w-4 text-destructive" />
             Critical Risk
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
-         5
+          5
           <p className="text-xs text-muted-foreground">
             <TrendingUp className="inline h-3 w-3 mr-1" />
             +2.5%
@@ -55,6 +51,24 @@ function DashboardStats() {
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4 text-yellow-500" />
+            Medium Risk
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <div className="text-xl font-bold text-yellow-500">
+            {mediumRiskCustomers}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            <TrendingUp className="inline h-3 w-3 mr-1" />
+            +1 this week
+          </p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium flex items-center gap-2">
             <Users className="h-4 w-4 text-muted-foreground" />
             Overdue
           </CardTitle>
@@ -67,19 +81,6 @@ function DashboardStats() {
             <TrendingDown className="inline h-3 w-3 mr-1" />
             -1 yesterday
           </p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium flex items-center gap-2">
-            <Shield className="h-4 w-4 text-muted-foreground" />
-            Health Score
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <div className="text-xl font-bold text-primary">78%</div>
-          <Progress value={78} className="mt-1 h-2" />
         </CardContent>
       </Card>
     </div>
