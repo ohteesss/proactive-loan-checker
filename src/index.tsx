@@ -13,13 +13,17 @@ import {
   SelectTrigger,
 } from "@/components/ui/select";
 import { AlertTriangle, Bell, Filter, Search, Shield } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import NotificationPopup from "./components/notification";
 import { alerts } from "./constant/alerts";
 import { customers } from "./constant/customer";
 import DashboardStats from "./dashborad-stats";
-import { useNavigate } from "react-router";
-import { getRiskBadgeVariant, getStatusBadgeVariant } from "./lib/utils";
+import {
+  getRiskBadgeColor,
+  getRiskBadgeVariant,
+  getRiskProgressColor,
+} from "./lib/utils";
 
 function formatNaira(amount: number) {
   return `₦${(amount / 1000000).toFixed(1)}M`;
@@ -28,8 +32,17 @@ function formatNaira(amount: number) {
 export function LoanRiskDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [riskFilter, setRiskFilter] = useState("all");
-  const [showNotification, setShowNotification] = useState(true);
+  const [showNotification, setShowNotification] = useState(false);
   const navigate = useNavigate();
+
+  console.log(showNotification);
+
+  useEffect(() => {
+    if (!localStorage.getItem("notificationShown")) {
+      setShowNotification(true);
+      localStorage.setItem("notificationShown", "true");
+    }
+  }, []);
 
   const filteredCustomers = customers.filter((customer) => {
     const matchesSearch = customer.name
@@ -44,7 +57,9 @@ export function LoanRiskDashboard() {
     <div className="min-h-screen bg-background">
       <NotificationPopup
         isOpen={showNotification}
-        onClose={() => setShowNotification(false)}
+        onClose={() => {
+          setShowNotification(false);
+        }}
       />
 
       <header className="border-b bg-card px-4 py-3">
@@ -95,13 +110,14 @@ export function LoanRiskDashboard() {
                     <span>{alert.customer}</span>
                     <Badge
                       variant={
-                        alert.priority === "Critical"
+                        alert.priority === "Critical" ||
+                        alert.priority === "High"
                           ? "destructive"
-                          : alert.priority === "High"
-                          ? "secondary"
                           : "default"
                       }
-                      className="text-xs"
+                      className={`${
+                        alert.priority === "Medium" ? "bg-yellow-500" : ""
+                      } text-xs`}
                     >
                       {alert.priority}
                     </Badge>
@@ -156,7 +172,9 @@ export function LoanRiskDashboard() {
                   <h4 className="font-medium text-sm">{customer.name}</h4>
                   <Badge
                     variant={getRiskBadgeVariant(customer.riskLevel)}
-                    className="text-xs"
+                    className={`${getRiskBadgeColor(
+                      customer.riskLevel
+                    )} text-xs`}
                   >
                     {customer.riskLevel}
                   </Badge>
@@ -169,12 +187,14 @@ export function LoanRiskDashboard() {
                     </span>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Status: </span>
+                    <span className="text-muted-foreground">
+                      Loan Facility:{" "}
+                    </span>
                     <Badge
-                      variant={getStatusBadgeVariant(customer.status)}
-                      className="text-xs"
+                      variant="outline"
+                      className="text-xs border-blue-400"
                     >
-                      {customer.status}
+                      {customer.facilityType}
                     </Badge>
                   </div>
                 </div>
@@ -184,18 +204,35 @@ export function LoanRiskDashboard() {
                     <span className="text-xs font-medium">
                       {customer.riskScore}
                     </span>
-                    <Progress value={customer.riskScore} className="w-12 h-1" />
+                    <Progress
+                      value={customer.riskScore}
+                      className="w-12 h-1 "
+                      color={getRiskProgressColor(customer.riskScore)}
+                    />
                   </div>
+
                   {customer.daysOverdue > 0 && (
                     <span className="text-xs text-destructive font-medium">
-                      {customer.daysOverdue} days overdue
+                      {Math.abs(customer.daysOverdue)} days overdue
+                    </span>
+                  )}
+
+                  {customer.daysOverdue === 0 && (
+                    <span className="text-xs text-muted-foreground font-medium">
+                      On time
+                    </span>
+                  )}
+
+                  {customer.daysOverdue < 0 && (
+                    <span className="text-xs text-green-500 font-medium">
+                      {Math.abs(customer.daysOverdue)} days ahead
                     </span>
                   )}
                 </div>
                 <Button
                   variant="outline"
                   size="sm"
-                  className="w-full text-xs bg-transparent"
+                  className="w-full text-xs bg-gray-300 cursor-pointer hover:bg-gray-400 transition-all "
                   onClick={() => navigate(`/customer/${customer.id}`)}
                 >
                   View Details
