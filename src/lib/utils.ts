@@ -47,3 +47,13 @@ export function getRiskBadgeColor(riskLevel: string) {
       return "bg-gray-500 text-white";
   }
 }
+
+export function getRiskProgressColor(riskScore: number) {
+  if (riskScore < 30) {
+    return "green";
+  } else if (riskScore < 70) {
+    return "yellow";
+  } else {
+    return "red";
+  }
+}
