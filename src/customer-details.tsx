@@ -20,11 +20,7 @@ import {
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router";
 import { customers } from "./constant/customer";
-import {
-  getRiskBadgeVariant,
-  getRiskBadgeColor,
-  getStatusBadgeVariant,
-} from "./lib/utils";
+import { getRiskBadgeVariant, getRiskBadgeColor } from "./lib/utils";
 
 interface ContactLog {
   id: number;
@@ -115,16 +111,14 @@ export function CustomerDetails() {
 
       <div className="p-4 space-y-4">
         {/* Risk Alert */}
-        <Alert className="border-destructive bg-destructive/5">
-          <AlertTriangle className="h-4 w-4 text-destructive" />
-          <AlertTitle className="text-destructive">
-            High Risk Customer
-          </AlertTitle>
-          <AlertDescription>
-            Payment overdue by {customerData.daysOverdue} days. Immediate action
-            required.
-          </AlertDescription>
-        </Alert>
+        {customerData.riskLevel === "High" && (
+          <Alert className="border-destructive bg-destructive/5">
+            <AlertTriangle className="h-4 w-4 text-destructive" />
+            <AlertTitle className="text-destructive">
+              High Risk Customer
+            </AlertTitle>
+          </Alert>
+        )}
 
         {/* Customer Info */}
         <Card>
@@ -211,9 +205,23 @@ export function CustomerDetails() {
 
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">Status:</span>
-              <Badge variant={getStatusBadgeVariant(customerData.status)}>
-                {customerData.status} ({customerData.daysOverdue} days overdue)
-              </Badge>
+              {customerData.daysOverdue > 0 && (
+                <span className="text-xs text-destructive font-medium">
+                  {Math.abs(customerData.daysOverdue)} days overdue
+                </span>
+              )}
+
+              {customerData.daysOverdue === 0 && (
+                <span className="text-xs text-muted-foreground font-medium">
+                  On time
+                </span>
+              )}
+
+              {customerData.daysOverdue < 0 && (
+                <span className="text-xs text-green-500 font-medium">
+                  {Math.abs(customerData.daysOverdue)} days ahead
+                </span>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -295,7 +303,13 @@ export function CustomerDetails() {
                         ? "destructive"
                         : "secondary"
                     }
-                    className="text-xs"
+                    className={` ${
+                      log.outcome === "Positive Feedback"
+                        ? "bg-green-500"
+                        : log.outcome === "Negative Feedback"
+                        ? "bg-red-500"
+                        : "bg-yellow-500"
+                    } text-xs`}
                   >
                     {log.outcome}
                   </Badge>
